@@ -2,18 +2,22 @@
 
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<title>Moda&amp;Estilo</title>
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet"/>
-<link rel="icon" href="favicon.ico">
+ <meta charset="utf-8"/>
+  <title>Moda & Estilo</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-</meta><link href="style.css" rel="stylesheet"/><script defer="True" src="app.js"></script></head>
+  <!-- Estilos y fuentes -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <link rel="icon" href="favicon.ico">
+  <link href="style.css" rel="stylesheet"/>
 
+  <!-- Tu script principal -->
+  <script defer src="app.js"></script>
 <body>
 
 <!-- Encabezado -->
@@ -40,6 +44,7 @@
 <div style="height: 30px;"></div>
 <div id="notificacion" class="notificacion oculto">Agregado</div>
 
+
 <!-- Botón que despliega TODO -->
 <div class="fila-carrito">
   <button class="btn-azul icono-carrito-fijo" onclick="toggleCarrito()">🛒</button>
@@ -47,7 +52,7 @@
 
 <!-- Contenedor de todo: carrito, total, botones y formulario -->
 <div id="bloqueCarrito" class="container">
-<span class="cerrar-carrito" onclick="toggleCarrito()">🛒</span>
+  <span class="cerrar-carrito" onclick="toggleCarrito()">🛒</span>
 
   <div id="carrito"></div>
   <div id="total-carrito"></div>
@@ -57,48 +62,50 @@
     <button class="btn-verde" onclick="mostrarFormulario()">✅ Finalizar compra</button>
   </div>
 
-  <!-- Formulario de cliente -->
-  <div class="oculto" id="formularioCliente" style="margin-top: 2rem;">
-    <form onsubmit="event.preventDefault(); confirmarEnvioWhatsApp();">
+  <!-- Formulario de cliente (modal) -->
+  <div id="formularioCliente">
+    <div id="formularioContenido">
+      <form onsubmit="event.preventDefault(); confirmarEnvioWhatsApp();">
 
-      <div class="campo-formulario">
-        <label for="nombreCliente">👤 Nombre completo</label>
-        <input id="nombreCliente" type="text" required />
-      </div>
+        <div class="campo-formulario">
+          <label for="nombreCliente">👤 Nombre completo</label>
+          <input id="nombreCliente" type="text" required />
+        </div>
 
-      <div class="campo-formulario">
-        <label for="departamentoCliente">🏛️ Departamento</label>
-        <input id="departamentoCliente" type="text" required />
-      </div>
+        <div class="campo-formulario">
+          <label for="departamentoCliente">🏛️ Departamento</label>
+          <input id="departamentoCliente" type="text" required />
+        </div>
 
-      <div class="campo-formulario">
-        <label for="ciudadCliente">🏙️ Ciudad</label>
-        <input id="ciudadCliente" type="text" required />
-      </div>
+        <div class="campo-formulario">
+          <label for="ciudadCliente">🏙️ Ciudad</label>
+          <input id="ciudadCliente" type="text" required />
+        </div>
 
-      <div class="campo-formulario">
-        <label for="direccionCliente">🏠 Dirección</label>
-        <input id="direccionCliente" type="text" required />
-      </div>
+        <div class="campo-formulario">
+          <label for="direccionCliente">🏠 Dirección</label>
+          <input id="direccionCliente" type="text" required />
+        </div>
 
-      <div class="campo-formulario">
-        <label for="celularCliente">📞 Celular</label>
-        <input id="celularCliente" type="tel" pattern="[0-9]{10}" placeholder="Ej: 3111234567" maxlength="10" required />
-      </div>
+        <div class="campo-formulario">
+          <label for="celularCliente">📞 Celular</label>
+          <input id="celularCliente" type="tel" pattern="[0-9]{10}" placeholder="Ej: 3111234567" maxlength="10" required />
+        </div>
 
-      <div class="campo-formulario">
-        <label for="metodoPagoCliente">💳 Selecciona tu método de pago</label>
-        <select id="metodoPagoCliente" required>
-          <option value="">Selecciona una opción</option>
-        </select>
-      </div>
+        <div class="campo-formulario">
+          <label for="metodoPagoCliente">💳 Selecciona tu método de pago</label>
+          <select id="metodoPagoCliente" required>
+            <option value="">Selecciona una opción</option>
+          </select>
+        </div>
 
-      <div class="botones">
-        <button type="submit" class="btn-verde">📲 Enviar pedido por WhatsApp</button>
-        <button type="button" class="btn-gris" onclick="ocultarFormulario()">🔙 Volver</button>
-      </div>
+        <div class="botones">
+          <button type="submit" class="btn-verde">📲 Enviar pedido por WhatsApp</button>
+          <button type="button" class="btn-gris" onclick="ocultarFormulario()">🔙 Volver</button>
+        </div>
 
-    </form>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -121,7 +128,6 @@
   </div>
 
   <div class="descripcion-general">
-    <label>Transportadoras:</label>
     <p id="textoGaleria"></p>
   </div>
 </div>
@@ -144,7 +150,6 @@
     </div>
   </footer>
 
-<!-- AL FINAL DE index.html -->
-<script src="app.js"></script>
+
 </body>
 </html>

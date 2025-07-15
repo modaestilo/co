@@ -58,43 +58,43 @@ db.collection("contenido").doc("quienesSomos").get().then(doc => {
     // === main.js ===
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
-    function actualizarCarrito() {
-      const div = document.getElementById('carrito');
-      div.innerHTML = '';
+  function actualizarCarrito() {
+  const div = document.getElementById('carrito');
+  div.innerHTML = '';
 
-      if (carrito.length === 0) {
-        div.innerHTML = '<p style="text-align:center; color: #888;">🛒 El carrito está vacío</p>';
-      }
+  if (carrito.length === 0) {
+    div.innerHTML = '<p style="text-align:center; color: #888;">🛒 El carrito está vacío</p>';
+  }
 
-      carrito.forEach((item, index) => {
-        const tarjeta = document.createElement('div');
-        tarjeta.className = 'item-carrito-elegante';
-      tarjeta.innerHTML = `
+  carrito.forEach((item, index) => {
+    const tarjeta = document.createElement('div');
+    tarjeta.className = 'item-carrito-elegante';
+    tarjeta.innerHTML = `
   <div class="carrito-info">
     <div class="info-superior">
       <h4>${item.nombre}</h4>
     </div>
     <p>🎨 Color: <strong>${item.color}</strong></p>
     <p>📏 Talla: <strong>${item.talla}</strong></p>
-    <p>💲 Precio: <strong>$${item.precio ? item.precio.toLocaleString() : 'N/A'}</strong></p>
+    <p>💲 Precio: <strong>$${parseInt(item.precio).toLocaleString()}</strong></p>
     <div style="margin-top: 8px; text-align: right;">
       <span class="icono-eliminar" onclick="eliminarProducto(event, ${index})">❌</span>
     </div>
   </div>
 `;
 
-        div.appendChild(tarjeta);
-      });
+    div.appendChild(tarjeta);
+  });
 
-      const total = carrito.reduce((acc, item) => acc + item.precio, 0);
-      document.getElementById('total-carrito').innerHTML = `
+  const total = carrito.reduce((acc, item) => acc + parseInt(item.precio), 0);
+  document.getElementById('total-carrito').innerHTML = `
     <div class="total-carrito">
       🧾 <strong>Total:</strong> <span>$${total.toLocaleString()}</span>
     </div>
   `;
 
-      localStorage.setItem('carrito', JSON.stringify(carrito));
-    }
+  localStorage.setItem('carrito', JSON.stringify(carrito));
+}
 
     function eliminarProducto(event, index) {
   event.stopPropagation(); // 👈 Previene que se cierre el carrito
@@ -125,23 +125,25 @@ function toggleCarrito() {
   }
 }
 
-
-
 function mostrarFormulario() {
   if (carrito.length === 0) {
     alert("Tu carrito está vacío.");
     return;
   }
-  const formContainer = document.getElementById('formularioCliente'); // ✅ ID correcto
-  formContainer.classList.remove('oculto');
+  const formContainer = document.getElementById('formularioCliente');
+  formContainer.classList.add('formulario-visible'); // ✅ NUEVA CLASE
   formContainer.scrollIntoView({ behavior: 'smooth' });
 }
 
-function ocultarFormulario() {
-  document.getElementById('formularioCliente').classList.add('oculto');
-  document.getElementById('bloqueCarrito').classList.remove('oculto');
 
-  // Restaurar icono del botón si se había cambiado
+function ocultarFormulario() {
+  const form = document.getElementById('formularioCliente');
+  form.classList.remove('formulario-visible');
+  form.classList.remove('oculto'); // por si quedó activa
+
+  const carrito = document.getElementById('bloqueCarrito');
+  carrito.classList.remove('oculto');
+
   const btn = document.querySelector('.fila-carrito button');
   if (btn) {
     btn.textContent = '🛒';
@@ -169,6 +171,9 @@ function guardarQuienesSomos() {
         notif.classList.add("oculto");
       }, 3000);
     }
+
+
+
 
     function confirmarEnvioWhatsApp() {
   const campos = {
@@ -201,33 +206,24 @@ function guardarQuienesSomos() {
   const fechaFormateada = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
   let mensaje = `📦 *NUEVO PEDIDO*\n\n🗓️ *Fecha:* ${fechaFormateada}\n\n`;
 
-  carrito.forEach((item, i) => {
-    mensaje += `🥿 *Producto ${i + 1}*: ${item.nombre} - Color: ${item.color} - Talla: ${item.talla} - Precio: $${item.precio.toLocaleString()}\n`;
-  });
+ carrito.forEach((item, i) => {
+  mensaje += `🥿 *Producto ${i + 1}*: ${item.nombre} - Color: ${item.color} - Talla: ${item.talla} - Precio: $${parseInt(item.precio).toLocaleString()}\n`;
+});
 
-  const total = carrito.reduce((acc, item) => acc + item.precio, 0);
-  mensaje += `\n💰 *Total:* $${total.toLocaleString()}\n\n`;
+  const total = carrito.reduce((acc, item) => acc + parseInt(item.precio), 0);
+mensaje += `\n💰 *Total:* $${total.toLocaleString()}\n\n`;
   mensaje += `📍 *Nombre:* ${campos.nombre}\n`;
   mensaje += `🏛️ *Departamento:* ${campos.departamento}\n`;
   mensaje += `🏙️ *Ciudad:* ${campos.ciudad}\n`;
   mensaje += `🏠 *Dirección:* ${campos.direccion}\n`;
   mensaje += `📞 *Celular:* ${campos.celular}\n`;
   mensaje += `💳 *Método de pago seleccionado:* ${campos.metodo}\n`;
+mensaje += `\n🙌 *¡Gracias por tu compra!* Te contactaremos pronto para coordinar el envío.`;
 
   const numeroWhatsApp = window.numeroWspConfig || '573185634316';
 
   // Obtener métodos de pago desde Firebase y luego enviar mensaje
-  db.collection("metodosPago").get().then(snapshot => {
-    const metodos = [];
-    snapshot.forEach(doc => {
-      const metodo = doc.data();
-      metodos.push(`${metodo.nombre}: ${metodo.cuenta}`);
-    });
-
-    if (metodos.length > 0) {
-      mensaje += `\n🔐 *Otras opciones de pago:*\n${metodos.map(m => `• ${m}`).join('\n')}`;
-    }
-
+    db.collection("metodosPago").get().then(() => {
     const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, '_blank');
 
@@ -255,6 +251,7 @@ function guardarQuienesSomos() {
     console.error("❌ Error al cargar métodos de pago:", err);
     alert("Hubo un error al obtener los métodos de pago.");
   });
+
 }
 
  // Descuento extra
@@ -270,7 +267,7 @@ function guardarQuienesSomos() {
 
 
       //const porcentajeDescuento = 0.10; // 10%
-      const precioExtraDescuento = Math.round(precioBase * 0.9);
+      const precioExtraDescuento = Math.round(precioBase * 1);
 
       let inicio = localStorage.getItem(`descuentoInicio_${id}`);
       if (!inicio) {
@@ -580,7 +577,7 @@ tallas.forEach(t => {
       });
     }
 
-function cargarMetodosPagoPublico() {
+  function cargarMetodosPagoPublico() {
   const lista = document.getElementById('listaMetodosPagoPublico');
   if (!lista) return;
 
@@ -615,6 +612,7 @@ function cargarOpcionesMetodoPago() {
 }
 
 
+
 window.addEventListener("DOMContentLoaded", () => {
   actualizarCarrito();
   cargarProductosDesdeFirebase();
@@ -622,46 +620,45 @@ window.addEventListener("DOMContentLoaded", () => {
 cargarOpcionesMetodoPago();
 cargarGaleriaDesdeFirebase();
 
+document.addEventListener("click", (event) => {
+  const formulario = document.getElementById("formularioCliente");
+  const contenidoFormulario = formulario?.querySelector("form");
+  const carrito = document.getElementById("bloqueCarrito");
+  const btnToggle = document.querySelector(".fila-carrito button");
 
-  document.addEventListener("click", (event) => {
-    const formulario = document.getElementById("formularioCliente");
-    const carrito = document.getElementById("bloqueCarrito");
-    const btnToggle = document.querySelector(".fila-carrito button");
+  if (!formulario || !carrito || !btnToggle) return;
 
-    if (!formulario || !carrito || !btnToggle) return;
+  const hizoClickEnFormulario = contenidoFormulario?.contains(event.target);
+  const hizoClickEnCarrito = carrito.contains(event.target);
+  const hizoClickEnBoton = btnToggle.contains(event.target);
+  const hizoClickEnEliminar = event.target.classList.contains("icono-eliminar");
 
-    const hizoClickEnFormulario = formulario.contains(event.target);
-    const hizoClickEnCarrito = carrito.contains(event.target);
-    const hizoClickEnBoton = btnToggle.contains(event.target);
-    const hizoClickEnEliminar = event.target.classList.contains("icono-eliminar");
+  // Cierra el FORMULARIO si está visible y se hace clic fuera
+  if (
+    formulario.classList.contains("formulario-visible") &&
+    !hizoClickEnFormulario &&
+    !hizoClickEnBoton &&
+    !hizoClickEnCarrito
+  ) {
+    formulario.classList.remove("formulario-visible");
+    carrito.classList.remove("oculto");
+  }
 
-    // --- Ocultar solo el formulario si está visible y se hizo clic fuera ---
-    if (
-      !formulario.classList.contains("oculto") &&
-      !hizoClickEnFormulario &&
-      !hizoClickEnBoton &&
-      !hizoClickEnCarrito
-    ) {
-      formulario.classList.add("oculto");
-      carrito.classList.remove("oculto"); // Mostrar carrito si se cierra el formulario
-    }
+  // Cierra el CARRITO si está visible y se hace clic fuera
+  if (
+    carrito.classList.contains("mostrar") &&
+    !hizoClickEnCarrito &&
+    !hizoClickEnBoton &&
+    !hizoClickEnEliminar
+  ) {
+    carrito.classList.remove("mostrar");
+    carrito.classList.add("oculto");
+    btnToggle.textContent = "🛒";
+    btnToggle.classList.remove("ocultar-carrito");
+    btnToggle.classList.add("ver-carrito");
+  }
+});
 
-    // --- Ocultar carrito si está visible y se hizo clic fuera de todo (excepto eliminar) ---
- if (
-  !carrito.classList.contains("oculto") &&
-  !hizoClickEnCarrito &&
-  !hizoClickEnBoton &&
-  !hizoClickEnEliminar
-) {
-  carrito.classList.remove("mostrar");  // 👈 Oculta visualmente
-  carrito.classList.add("oculto");      // 👈 Asegura que se oculte bien
-
-  btnToggle.textContent = "🛒";
-  btnToggle.classList.remove("ocultar-carrito");
-  btnToggle.classList.add("ver-carrito");
-}
-
-  });
 });
 
 function cargarGaleriaDesdeFirebase() {

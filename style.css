@@ -1,3 +1,4 @@
+
 :root {
   --color-principal: #000000;
   --color-secundario: #ffffff;
@@ -7,6 +8,13 @@
   --borde-radius: 12px;
   --trans: all 0.3s ease;
   --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --verde: #2eb719;
+--verde-hover: #3ddc84;
+--gris-hover: #8b99a5;
+--fondo-buscador: #eae0e6;
+--borde-input: #a3a0a0;
+--sombra-botones: 0 6px 18px rgba(255, 255, 255, 0.2);
+
 }
 
 
@@ -15,8 +23,12 @@
   ocultar descuento extra      borrar para mostrar descuento extra
 =================================== */
 .descuento-tiempo {
-  display: none !important;
+  display: none;
 }
+.descuento-activa {
+  display: block;
+}
+
 
 /* ===================================
    🔄 RESET GENERAL
@@ -170,17 +182,6 @@ header h1 {
   transition: var(--trans);
 }
 
-/* ===============================
-   🧱 CONTENEDOR DE PRODUCTOS GRID
-=============================== */
-.contenedor-productos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
 
 
 .producto:hover {
@@ -306,10 +307,10 @@ header h1 {
 }
 
 .imagenes-carrusel {
-  display: none !important;
-  height: 0 !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
+  display: none;
+  height: 0;
+  visibility: hidden;
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -320,7 +321,6 @@ header h1 {
 button,
 .btn-verde,
 .btn-gris,
-.btn-azul,
 .btn-agregar {
   padding: 0.9rem 1.2rem;
   font-size: 1rem;
@@ -411,27 +411,28 @@ button:hover {
   background-color: #76f526;
   color: #131aeb;
 }
+
 #bloqueCarrito.container {
-  position: fixed; /* Cambia de relative a fixed */
+  position: fixed;
   top: 0;
-  right: -100%; /* Oculto inicialmente */
-  width: 420px;
+  right: 0;
+  width: 320px;
   height: 100vh;
   background-color: #fffcfc;
   padding: 1.5rem;
   z-index: 9999;
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.2);
   overflow-y: auto;
-  transition: right 0.3s ease;
-  border-radius: 0;
+  transition: transform 0.3s ease;
+  transform: translateX(100%); /* Oculto por defecto */
 }
 
 #bloqueCarrito.container.mostrar {
-  right: 0; /* Se desliza al frente */
+  transform: translateX(0); /* Visible cuando tiene .mostrar */
 }
 
-body.mostrar-carrito {
-  overflow: hidden; /* Evita scroll de fondo */
+#bloqueCarrito.container.oculto {
+  display: none;
 }
 
 .cerrar-carrito {
@@ -473,18 +474,7 @@ body.mostrar-carrito {
 }
 
 
-.icono-eliminar {
-  cursor: pointer;
-  color: #000 !important;  /* ✅ Fuerza el color negro */
-  font-size: 1.2rem;
-  margin-left: 10px;
-  transition: transform 0.2s ease;
-}
 
-.icono-eliminar:hover {
-  color: #000 !important;  /* ✅ Se mantiene negro al hacer hover */
-  transform: scale(1.2);
-}
 
 
 
@@ -495,44 +485,44 @@ body.mostrar-carrito {
   display: block; /* o flex/grid, según tu diseño */
 }
 
-
-/* ===================================
-   📋 FORMULARIO
-=================================== */
+/* ================================
+   📋 FORMULARIO DE COMPRA CLIENTE
+================================ */
 #formularioCliente {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#formularioCliente.formulario-visible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
 }
 
 #formularioCliente form {
   background: #fff;
-  padding: 1rem;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  align-items: center;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .campo-formulario {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  margin-bottom: 1rem;
   width: 100%;
-  max-width: 500px;
-  margin-bottom: 0.5rem;
 }
 
 .campo-formulario label {
@@ -553,27 +543,46 @@ body.mostrar-carrito {
   transition: border-color 0.3s ease;
 }
 
-#formularioCliente form .botones {
+.campo-formulario input:focus,
+.campo-formulario select:focus {
+  border-color: var(--color-principal);
+  outline: none;
+}
+
+#formularioCliente .botones {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1rem;
+  margin-top: 1.5rem;
   align-items: center;
-  width: 100%;
 }
 
-#formularioCliente {
-  opacity: 0;
-  transform: scale(0.95);
-  transition: all 0.3s ease;
-  pointer-events: none;
+#formularioCliente .botones button {
+  padding: 0.9rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-#formularioCliente:not(.oculto) {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto;
+#formularioCliente .botones .btn-enviar {
+  background-color: var(--color-principal);
+  color: white;
 }
 
+#formularioCliente .botones .btn-enviar:hover {
+  background-color: var(--color-principal-hover, #0056b3);
+}
+
+#formularioCliente .botones .btn-cancelar {
+  background-color: #ccc;
+  color: #333;
+}
+
+#formularioCliente .botones .btn-cancelar:hover {
+  background-color: #bbb;
+}
 
 
 /* ===================================
